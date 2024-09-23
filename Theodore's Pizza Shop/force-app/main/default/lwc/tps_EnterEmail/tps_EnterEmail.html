@@ -1,0 +1,24 @@
+<template>
+    <lightning-card icon-name="standard:email" title="Enter Your Email Address">
+        <lightning-layout class="slds-var-m-left_small slds-var-m-right_small">
+            <lightning-input class="slds-size_1-of-1" type="email" label="Email" value={email} onchange={handleInputChange}></lightning-input>
+        </lightning-layout>
+        <div class="slds-align_absolute-center slds-var-p-top_x-small">
+            <lightning-button variant="brand" label="Search" onclick={handleSearch}></lightning-button>
+        </div>
+        <div class="slds-var-p-left_small slds-var-p-top_small">
+            <template if:true={customer}>
+                <template for:each={customer} for:item="customer">
+                    <p key={customer.Name}>{customer.Name}</p>
+                    <p key={customer.Email}>{customer.Email}</p>
+                    <p key={customer.Phone}>{customer.Phone}</p>
+                </template>
+            </template>
+            <template if:true={error}>
+                <lightning-layout-item>
+                    <p class="slds-text-color_error">{error}</p>
+                </lightning-layout-item>
+            </template>
+        </div>
+    </lightning-card>
+</template>
