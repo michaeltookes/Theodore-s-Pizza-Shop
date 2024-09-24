@@ -1,6 +1,22 @@
 import { LightningElement, track } from 'lwc';
+import createPizzaOrder from '@salesforce/apex/tps_PizzaOrderController.createPizzaOrder';
+import submitPizzas from '@salesforce/apex/tps_PizzaOrderController.submitPizzas';
 
 export default class Tps_OrderPage extends LightningElement {
+
+   @track pizzaOrderId;
+
+    connectedCallback() {
+        
+        createPizzaOrder()
+        .then(result => {
+            this.pizzaOrderId = result;
+        })
+        .catch(error => {
+            console.error('Error creating Pizza Order: ', error);
+        });
+
+    }
 
    @track itemList = [
         {
@@ -20,6 +36,7 @@ export default class Tps_OrderPage extends LightningElement {
     keyIndex = 0;
 
     addRow() {
+       
         ++this.keyIndex;
         var newItem = [{ 
             id: this.keyIndex,
@@ -35,9 +52,11 @@ export default class Tps_OrderPage extends LightningElement {
         }];
         
         this.itemList = this.itemList.concat(newItem);
+
     }
     
     handleInputChange(event) {
+        
         const fieldName = event.target.name;
         const value = event.target.value;
         const sectionIndex = event.target.dataset.section;
@@ -58,7 +77,12 @@ export default class Tps_OrderPage extends LightningElement {
 
     }
 
+    get orderSubTotal() {
+        return this.itemList.reduce((total, item) => total + item.result, 0);
+    }
+
     calculateSizePrice(size) {
+        
         let price = 0;
 
         if (size === 'Extra Large') {
@@ -74,6 +98,7 @@ export default class Tps_OrderPage extends LightningElement {
     }
 
     calculateCrustPrice(crust) {
+        
         let price = 0;
 
         if (crust === 'Thin') {
@@ -88,6 +113,7 @@ export default class Tps_OrderPage extends LightningElement {
     }
 
     calculateSaucePrice(sauce) {
+        
         let price = 0;
 
         if (sauce === 'Alfredo') {
@@ -102,6 +128,7 @@ export default class Tps_OrderPage extends LightningElement {
     }
 
     calculateToppingPrice(topping) {
+        
         let price = 0;
 
         if (topping === 'Pepperoni') {
@@ -113,6 +140,28 @@ export default class Tps_OrderPage extends LightningElement {
         }
         return price;
     
+    }
+
+    handleSubmit() {
+
+        let pizzaList = this.itemList.map(item=> {
+            return {
+                tps_Size__c: item.inputSize,
+                tps_Crust__c: item.inputCrust,
+                tps_Sauce__c: item.inputSauce,
+                tps_Topping__c: item.inputTopping,
+                tps_Price__c: item.result
+            };
+        });
+
+        submitPizzas({ pizzaOrderId: this.pizzaOrderId, pizzaList: pizzaList })
+            .then(() => {
+                console.log('Pizzas submitted successfully.');
+            })
+            .catch (error => {
+                console.error('Error submitting pizzas.', error);
+            });
+            
     }
 
 }
