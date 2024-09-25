@@ -5,13 +5,21 @@
                 <lightning-messages></lightning-messages>
                 <div class="slds-grid slds-var-m-left_small slds-var-m-right_small">
                     <div class="slds-col slds-size_1-of-2">
-                        <lightning-input-field field-name="tps_Size__c" name="tps_Size__c" data-section={index} value={item.inputSize} required="true" onchange={handleInputChange}></lightning-input-field>
-                        <lightning-input-field field-name="tps_Sauce__c" name="tps_Sauce__c" data-section={index} value={item.inputSauce} required="true" onchange={handleInputChange}></lightning-input-field>
+                        <template if:true={sizeOptions}>
+                        <lightning-combobox label="Size" name="tps_Size__c" placeholder="Select Size" data-section={index} value={item.inputSize} options={sizeOptions} required="true" onchange={handleInputChange}></lightning-combobox>
+                        </template>
+                        <template if:true={sauceOptions}>
+                        <lightning-combobox label="Sauce" name="tps_Sauce__c" placeholder="Select Sauce" data-section={index} value={item.inputSauce} options={sauceOptions} required="true" onchange={handleInputChange}></lightning-combobox>
+                        </template>
                         <lightning-input-field field-name="tps_Price__c" name="tps_Price__c" data-section={index} value={item.result} read-only="true"></lightning-input-field> 
                     </div>
                     <div class="slds-col slds-size_1-of-2">
-                        <lightning-input-field field-name="tps_Crust__c" name="tps_Crust__c" data-section={index} value={item.inputCrust} required="true" onchange={handleInputChange}></lightning-input-field>
-                        <lightning-input-field field-name="tps_Topping__c" name="tps_Topping__c" data-section={index} value={item.inputTopping} required="true" onchange={handleInputChange}></lightning-input-field>
+                        <template if:true={crustOptions}>
+                        <lightning-combobox label="Crust" name="tps_Crust__c" placeholder="Select Crust" data-section={index} value={item.inputCrust} options={crustOptions} required="true" onchange={handleInputChange}></lightning-combobox>
+                        </template>
+                        <template if:true={toppingOptions}>
+                        <lightning-combobox label="Topping" name="tps_Topping__c" placeholder="Select Topping" data-section={index} value={item.inputTopping} options={toppingOptions} required="true" onchange={handleInputChange}></lightning-combobox>
+                        </template>
                     </div>
                 </div>
             </lightning-record-edit-form>
@@ -21,7 +29,7 @@
             <lightning-button-icon class="slds-float_left slds-var-m-left_small slds-var-m-top_medium" icon-name="action:new" size="medium" title="Add Row" onclick={addRow}><label>Add Row</label></lightning-button-icon>
             <div class="slds-align_absolute-center slds-var-p-top_medium">
                 <lightning-button class="slds-var-m-right_x-small" variant="Neutral" label="Cancel"></lightning-button>
-                <lightning-button variant="brand" label="Submit"></lightning-button>
+                <lightning-button variant="brand" label="Submit" onclick={handleSubmit}></lightning-button>
             </div>    
         </div>
     </lightning-card>

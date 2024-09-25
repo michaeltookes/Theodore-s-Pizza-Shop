@@ -1,16 +1,88 @@
-import { LightningElement, track } from 'lwc';
+import { LightningElement, track, wire } from 'lwc';
 import createPizzaOrder from '@salesforce/apex/tps_PizzaOrderController.createPizzaOrder';
 import submitPizzas from '@salesforce/apex/tps_PizzaOrderController.submitPizzas';
+import { getPicklistValues, getObjectInfo } from 'lightning/uiObjectInfoApi';
+import PIZZA_OBJECT from '@salesforce/schema/tps_Pizza__c';
+import CRUST_FIELD from '@salesforce/schema/tps_Pizza__c.tps_Crust__c';
+import SAUCE_FIELD from '@salesforce/schema/tps_Pizza__c.tps_Sauce__c';
+import SIZE_FIELD from '@salesforce/schema/tps_Pizza__c.tps_Size__c';
+import TOPPING_FIELD from '@salesforce/schema/tps_Pizza__c.tps_Topping__c';
 
 export default class Tps_OrderPage extends LightningElement {
 
-   @track pizzaOrderId;
+   @track pizzaRecordTypeId;
+   @track crustOptions = [];
+   @track sauceOptions = [];
+   @track sizeOptions = [];
+   @track toppingOptions = [];
+   @track isLoading = true;
+   error;
+   
+    @wire (getObjectInfo, { objectApiName: PIZZA_OBJECT })
+    handleObjectInfo ({ error, data }) {
+        if (data) {
+            this.pizzaRecordTypeId = data.defaultRecordTypeId;
+            this.error = undefined;
+        } else if (error) {
+            this.error = error;
+            this.pizzaRecordTypeId = undefined;
+        }
+    }
+
+    @wire (getPicklistValues, { recordTypeId: '$pizzaRecordTypeId', fieldApiName: '$fieldApiName' })
+    wiredPicklistValues({ error, data }) {
+        if (data) {
+            this.setPicklistOptions(this.fieldApiName, data.values);
+            this.isLoading = false;
+        } else if (error) {
+            this.error = error;
+        }
+    }
+
+    get fieldApiName() {
+
+        if (!this.crustOptions.length) {
+            return CRUST_FIELD;
+        } else if (!this.sauceOptions.length) {
+            return SAUCE_FIELD;
+        } else if (!this.sizeOptions.length) {
+            return SIZE_FIELD;
+        } else if (!this.toppingOptions.length) {
+            return TOPPING_FIELD;
+        }
+        return null;
+    }
+
+    setPicklistOptions(field, values) {
+        
+        switch(field) {
+            case CRUST_FIELD:
+                this.crustOptions = values;
+                break;
+            case SAUCE_FIELD:
+                this.sauceOptions = values;
+                break;
+            case SIZE_FIELD:
+                this.sizeOptions = values;
+                break;
+            case TOPPING_FIELD:
+                this.toppingOptions = values;
+                break;
+            default:
+                break;    
+        }
+
+    }
+   
+    @track pizzaOrderId;
+    pizzaOrderCreated = false;
 
     connectedCallback() {
         
         createPizzaOrder()
         .then(result => {
             this.pizzaOrderId = result;
+            this.pizzaOrderCreated = true;
         })
         .catch(error => {
             console.error('Error creating Pizza Order: ', error);
@@ -61,19 +133,33 @@ export default class Tps_OrderPage extends LightningElement {
         const value = event.target.value;
         const sectionIndex = event.target.dataset.section;
 
-        let item = this.itemList[sectionIndex];
+        let item = { ...this.itemList[sectionIndex] };
 
         if (fieldName === 'tps_Size__c') {
             item.sizePrice = this.calculateSizePrice(value);
+            item.inputSize = value;
+            console.log('Size: ' + value);
         } else if (fieldName === 'tps_Crust__c') {
             item.crustPrice = this.calculateCrustPrice(value);
+            item.inputCrust = value;
+            console.log('Crust: ' + value);
         } else if (fieldName === 'tps_Sauce__c') {
             item.saucePrice = this.calculateSaucePrice(value);
+            item.inputSauce = value;
+            console.log('Sauce: ' + value);
         } else if (fieldName === 'tps_Topping__c') {
             item.toppingPrice = this.calculateToppingPrice(value);
+            item.inputTopping = value;
+            console.log('Topping: ' + value);
         }
 
         item.result = item.sizePrice + item.crustPrice + item.saucePrice + item.toppingPrice;
+
+        this.itemList = [
+            ...this.itemList.slice(0, sectionIndex),
+            item,
+            ...this.itemList.slice(sectionIndex + 1)
+        ];
 
     }
 
@@ -161,7 +247,7 @@ export default class Tps_OrderPage extends LightningElement {
             .catch (error => {
                 console.error('Error submitting pizzas.', error);
             });
-            
+
     }
 
 }
