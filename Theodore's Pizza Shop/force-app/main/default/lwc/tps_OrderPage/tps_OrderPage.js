@@ -1,4 +1,5 @@
 import { LightningElement, track, wire } from 'lwc';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import createPizzaOrder from '@salesforce/apex/tps_PizzaOrderController.createPizzaOrder';
 import submitPizzas from '@salesforce/apex/tps_PizzaOrderController.submitPizzas';
 import { getPicklistValues, getObjectInfo } from 'lightning/uiObjectInfoApi';
@@ -264,11 +265,45 @@ export default class Tps_OrderPage extends LightningElement {
         submitPizzas({ pizzaOrderId: this.pizzaOrderId, pizzaList: pizzaList })
             .then(() => {
                 console.log('Pizzas submitted successfully.');
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Success',
+                        message: 'Pizza Order created successfully!',
+                        variant: 'success',
+                    })
+                );
+                this.resetComponentState();
             })
             .catch (error => {
                 console.error('Error submitting pizzas.', error);
+                this.dispatchEvent (
+                    new ShowToastEvent ({
+                        title: 'Error',
+                        message: 'There was an issue creating the order. Please try again.',
+                        variant: 'error',
+                    })
+                );
             });
 
+    }
+
+    resetComponentState() {
+        this.itemList = [
+            {
+                id: 0,
+                inputSize: '',
+                inputCrust: '',
+                inputSauce: '',
+                inputTopping: '',
+                sizePrice: 0,
+                crustPrice: 0,
+                saucePrice: 0,
+                toppingPrice: 0,
+                result: 0
+            }
+        ];
+        this.keyIndex = 0;
+        this.error = undefined;
     }
 
 }
