@@ -28,7 +28,7 @@
             <div class="slds-float_right slds-m-right_large slds-m-top_x-large"><b>Sub-Total: ${orderSubTotal}</b></div>
             <lightning-button-icon class="slds-float_left slds-var-m-left_small slds-var-m-top_medium" icon-name="action:new" size="medium" title="Add Row" onclick={addRow}><label>Add Row</label></lightning-button-icon>
             <div class="slds-align_absolute-center slds-var-p-top_medium">
-                <lightning-button class="slds-var-m-right_x-small" variant="Neutral" label="Cancel"></lightning-button>
+                <lightning-button class="slds-var-m-right_x-small" variant="Neutral" label="Cancel" onclick={handleCancel}></lightning-button>
                 <lightning-button variant="brand" label="Submit" onclick={handleSubmit}></lightning-button>
             </div>    
         </div>

@@ -228,6 +228,27 @@ export default class Tps_OrderPage extends LightningElement {
     
     }
 
+    handleCancel() {
+        this.itemList = [
+            {
+                id: 0,
+                inputSize: '',
+                inputCrust: '',
+                inputSauce: '',
+                inputTopping: '',
+                sizePrice: 0,
+                crustPrice: 0,
+                saucePrice: 0,
+                toppingPrice: 0,
+                result: 0
+            }
+        ];
+        this.keyIndex = 0;
+
+        this.error = undefined;
+        console.log('Component state reset to initial values');
+    }
+    
     handleSubmit() {
 
         let pizzaList = this.itemList.map(item=> {
