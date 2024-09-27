@@ -3,22 +3,30 @@
         <lightning-layout class="slds-var-m-left_small slds-var-m-right_small">
             <lightning-input class="slds-size_1-of-1" type="email" label="Email" value={email} onchange={handleInputChange}></lightning-input>
         </lightning-layout>
-        <div class="slds-align_absolute-center slds-var-p-top_x-small">
+        <div class="slds-align_absolute-center slds-var-p-top_medium">
+            <lightning-button class="slds-var-m-right_x-small" variant="neutral" label="Cancel" onclick={handleCancel}></lightning-button>
             <lightning-button variant="brand" label="Search" onclick={handleSearch}></lightning-button>
         </div>
-        <div class="slds-var-p-left_small slds-var-p-top_small">
-            <template if:true={customer}>
-                <template for:each={customer} for:item="customer">
-                    <p key={customer.Name}>{customer.Name}</p>
-                    <p key={customer.Email}>{customer.Email}</p>
-                    <p key={customer.Phone}>{customer.Phone}</p>
-                </template>
-            </template>
-            <template if:true={error}>
-                <lightning-layout-item>
-                    <p class="slds-text-color_error">{error}</p>
-                </lightning-layout-item>
-            </template>
-        </div>
+        <template if:true={customer}>
+            <div class="slds-grid slds-var-p-left_small slds-var-p-top_small">
+                <div class="slds-col slds-size_1-of-2">
+                    <template for:each={customer} for:item="customer">
+                        <p key={customer.Name}>{customer.Name}</p>
+                        <p key={customer.Email}>{customer.Email}</p>
+                        <p key={customer.Phone}>{customer.Phone}</p>
+                    </template>
+                </div>
+                <div class="slds-col slds-size_1-of-2 ">
+                    <div class="slds-grid slds-align_absolute-center slds-text-align_center">
+                        <lightning-button class="slds-m-top_small slds-m-left_xx-large" variant="success" label="Confirm Details" onclick={handleConfirmDetails}></lightning-button>
+                    </div>
+                </div>
+            </div>
+        </template>        
+        <template if:true={error}>
+            <lightning-layout-item>
+                <p class="slds-m-top_medium slds-m-left_small slds-text-color_error">{error}</p> 
+            </lightning-layout-item>
+        </template>
     </lightning-card>
 </template>
