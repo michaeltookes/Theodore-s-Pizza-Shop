@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>tps_Order_Total__c</fullName>
+    <label>Order Total</label>
+    <summarizedField>tps_Pizza__c.tps_Price__c</summarizedField>
+    <summaryForeignKey>tps_Pizza__c.tps_Pizza_Order__c</summaryForeignKey>
+    <summaryOperation>sum</summaryOperation>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Summary</type>
+</CustomField>

@@ -1,9 +1,12 @@
 public with sharing class tps_PizzaOrderController {
     
     @AuraEnabled
-    public static Id createPizzaOrder() {
+    public static Id createPizzaOrder(Id contactId) {
 
+        System.debug('ContactId: ' + contactId);
+        
         tps_Pizza_Order__c newOrder = new tps_Pizza_Order__c();
+        newOrder.tps_Contact__c = contactId;
         insert newOrder;
         return newOrder.Id;
 

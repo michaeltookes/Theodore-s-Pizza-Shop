@@ -1,4 +1,4 @@
-import { LightningElement, track, wire } from 'lwc';
+import { api, LightningElement, track, wire } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import createPizzaOrder from '@salesforce/apex/tps_PizzaOrderController.createPizzaOrder';
 import submitPizzas from '@salesforce/apex/tps_PizzaOrderController.submitPizzas';
@@ -16,9 +16,12 @@ export default class Tps_OrderPage extends LightningElement {
    @track sauceOptions = [];
    @track sizeOptions = [];
    @track toppingOptions = [];
+   @track contactId;
+   @track pizzaOrderId;
    @track isLoading = true;
-   error;
    
+    error;
+    
     @wire (getObjectInfo, { objectApiName: PIZZA_OBJECT })
     handleObjectInfo ({ error, data }) {
         if (data) {
@@ -74,20 +77,42 @@ export default class Tps_OrderPage extends LightningElement {
         }
 
     }
-   
-    @track pizzaOrderId;
-    pizzaOrderCreated = false;
 
     connectedCallback() {
-        
-        createPizzaOrder()
-        .then(result => {
-            this.pizzaOrderId = result;
-            this.pizzaOrderCreated = true;
-        })
-        .catch(error => {
-            console.error('Error creating Pizza Order: ', error);
-        });
+
+        window.addEventListener('contactconfirmed', this.handleContactConfirmed.bind(this));
+
+    }
+
+    handleContactConfirmed() {
+
+        this.contactId = event.detail.contactId;
+        console.log('Contact ID received from event: ', this.contactId);
+
+        this.createPizzaOrderWithContact();
+
+    }
+
+    disconnectedCallback() {
+
+        window.removeEventListener('contactconfirmed', this.handleContactConfirmed.bind(this));
+
+    }
+
+    createPizzaOrderWithContact() {
+
+        if (this.contactId) {
+
+            createPizzaOrder({contactId: this.contactId})
+            .then(result => {
+                this.pizzaOrderId = result;
+                console.log('Pizza Order created with ID: ' + this.pizzaOrderId);
+            })
+            .catch(error => {
+                console.error('Error creating Pizza Order: ', error);
+            });
+
+        }
 
     }
 
